@@ -142,7 +142,16 @@ body[data-scene='heaven'] .btn:not(.primary) { color: #1d1a3a; border-color: #b9
 .result { align-items: center; }
 .card-wrap { width: calc(360px * var(--s, 1)); height: calc(640px * var(--s, 1)); }
 .card-scale { width: 360px; transform: scale(var(--s, 1)); transform-origin: top left; }
+.cards { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 .result .actions { width: 100%; }
+/* Keep the share button reachable while scrolling through both cards. */
+.share-bar {
+  width: 100%; display: flex; flex-direction: column;
+  position: sticky; bottom: 0; z-index: 2;
+  padding: 12px 0 max(4px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, var(--navy) 35%);
+}
+.share-bar:empty { display: none; }
 
 /* Card (fixed 360×640; exported ×3 → 1080×1920) */
 .card {

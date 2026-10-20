@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { toBlob } from 'html-to-image';
-import { prepareCard, shareCard } from './share';
+import { prepareCards, shareCards } from './share';
 
 vi.mock('html-to-image', () => ({ toBlob: vi.fn(async () => new Blob(['png'], { type: 'image/png' })) }));
 
 const nav = navigator as unknown as Record<string, unknown>;
+const two = () => [document.createElement('div'), document.createElement('div')];
 
 beforeAll(() => {
   Object.defineProperty(document, 'fonts', { value: { ready: Promise.resolve() }, configurable: true });
@@ -20,49 +21,50 @@ afterEach(() => {
   vi.mocked(toBlob).mockClear();
 });
 
-test('uses Web Share with the PNG file when supported', async () => {
+test('shares both cards as PNG files in one Web Share call', async () => {
   const share = vi.fn(async () => {});
   nav.canShare = () => true;
   nav.share = share;
-  await shareCard(document.createElement('div'), 'my-destiny.png');
+  await shareCards(two(), ['death.png', 'destiny.png']);
+  expect(share).toHaveBeenCalledTimes(1);
   const arg = (share.mock.calls[0] as unknown as [ShareData])[0];
-  expect(arg.files?.[0].name).toBe('my-destiny.png');
-  expect(arg.files?.[0].type).toBe('image/png');
+  expect(arg.files?.map(f => f.name)).toEqual(['death.png', 'destiny.png']);
+  arg.files?.forEach(f => expect(f.type).toBe('image/png'));
 });
 
 test('user cancelling the share sheet is silent', async () => {
   nav.canShare = () => true;
   nav.share = vi.fn(async () => { throw new DOMException('cancel', 'AbortError'); });
-  await expect(shareCard(document.createElement('div'), 'a.png')).resolves.toBeUndefined();
+  await expect(shareCards(two(), ['a.png', 'b.png'])).resolves.toBeUndefined();
   expect(document.querySelector('.toast')).toBeNull();
 });
 
-test('falls back to download when Web Share is unavailable', async () => {
+test('falls back to downloading every card when Web Share is unavailable', async () => {
   const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
-  await shareCard(document.createElement('div'), 'a.png');
-  expect(click).toHaveBeenCalledTimes(1);
-  expect((click.mock.contexts[0] as HTMLAnchorElement).download).toBe('a.png');
+  await shareCards(two(), ['a.png', 'b.png']);
+  expect(click.mock.contexts.map(a => (a as HTMLAnchorElement).download)).toEqual(['a.png', 'b.png']);
 });
 
 test('other failures show a toast', async () => {
   nav.canShare = () => true;
   nav.share = vi.fn(async () => { throw new Error('boom'); });
-  await shareCard(document.createElement('div'), 'a.png');
+  await shareCards(two(), ['a.png', 'b.png']);
   expect(document.querySelector('.toast')?.textContent).toBe('บันทึกรูปไม่สำเร็จ ลองแคปหน้าจอแทนนะ');
 });
 
-test('prepareCard renders twice (Safari font warm-up) without cacheBust', async () => {
-  await prepareCard(document.createElement('div'));
-  expect(toBlob).toHaveBeenCalledTimes(2);
+test('prepareCards renders each card twice (Safari font warm-up) without cacheBust', async () => {
+  const blobs = await prepareCards(two());
+  expect(blobs).toHaveLength(2);
+  expect(toBlob).toHaveBeenCalledTimes(4);
   vi.mocked(toBlob).mock.calls.forEach(([, opts]) => expect(opts?.cacheBust).toBeFalsy());
 });
 
-test('shareCard uses the prepared image instead of rendering inside the tap', async () => {
+test('shareCards uses the prepared images instead of rendering inside the tap', async () => {
   const share = vi.fn(async () => {});
   nav.canShare = () => true;
   nav.share = share;
-  const prepared = Promise.resolve(new Blob(['png'], { type: 'image/png' }));
-  await shareCard(document.createElement('div'), 'a.png', prepared);
+  const prepared = Promise.resolve([new Blob(['a']), new Blob(['b'])]);
+  await shareCards(two(), ['a.png', 'b.png'], prepared);
   expect(toBlob).not.toHaveBeenCalled();
   expect(share).toHaveBeenCalledTimes(1);
 });
@@ -71,7 +73,7 @@ test('NotAllowedError (share outside user gesture, iOS) falls back to download',
   const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
   nav.canShare = () => true;
   nav.share = vi.fn(async () => { throw new DOMException('gesture', 'NotAllowedError'); });
-  await shareCard(document.createElement('div'), 'a.png');
-  expect(click).toHaveBeenCalledTimes(1);
+  await shareCards(two(), ['a.png', 'b.png']);
+  expect(click).toHaveBeenCalledTimes(2);
   expect(document.querySelector('.toast')).toBeNull();
 });

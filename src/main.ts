@@ -54,8 +54,8 @@ async function run() {
   s = picked.state;
   setScene('death');
   await play(death.script, { scene: 'death', finale: 'YOU DIED', next: 'ดูใบมรณบัตร →' });
-  await new Promise<void>(res => renderResult(root, renderDeathCard(death), `death-${death.id}.png`,
-    [{ label: 'ไปพบเทพธิดา →', cls: 'btn', onClick: res }], 'ใบมรณบัตรของคุณ'));
+  await new Promise<void>(res => renderResult(root, [renderDeathCard(death)], null,
+    [{ label: 'ไปพบเทพธิดา →', cls: 'btn primary', onClick: res }], 'ใบมรณบัตรของคุณ'));
 
   // Stage 2: goddess → rebirth
   setScene('heaven');
@@ -66,10 +66,16 @@ async function run() {
   const role = pickRole(s, roles, Math.random, fullBase);
   addToCollection(role.id);
   markPlayed();
-  renderResult(root, renderRoleCard(role, s, death), `destiny-${role.id}.png`, [
-    { label: '🔄 เกิดใหม่อีกครั้ง', onClick: run },
-    { label: '📜 Collection', cls: 'btn ghost', onClick: collection },
-  ], role.id === 'chicken' ? '???' : `Congratulations. You are ${role.nameEn.replace(/^THE /, 'the ').toLowerCase()}.`);
+  await new Promise<void>(res => renderResult(root, [renderRoleCard(role, s, death)], null,
+    [{ label: 'ดูใบสรุปชะตา →', cls: 'btn primary', onClick: res }],
+    role.id === 'chicken' ? '???' : `Congratulations. You are ${role.nameEn.replace(/^THE /, 'the ').toLowerCase()}.`));
+
+  // Summary: both cards, the only place to share
+  renderResult(root, [renderDeathCard(death), renderRoleCard(role, s, death)],
+    [`death-${death.id}.png`, `destiny-${role.id}.png`], [
+      { label: '🔄 เกิดใหม่อีกครั้ง', onClick: run },
+      { label: '📜 Collection', cls: 'btn ghost', onClick: collection },
+    ], 'ใบสรุปชะตาของคุณ');
 }
 
 landing();
