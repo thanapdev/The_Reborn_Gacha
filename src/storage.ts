@@ -1,6 +1,7 @@
 // localStorage can throw (Safari private mode, blocked site data). The game must keep working without it.
 const COLLECTION = 'isekai.collection.v1';
 const PLAYED = 'isekai.played.v1';
+const NOTICE = 'isekai.notice.v1';
 
 function read(key: string): string | null {
   try { return localStorage.getItem(key); } catch { return null; }
@@ -26,3 +27,5 @@ export function addToCollection(id: string): void {
 
 export const hasPlayed = () => read(PLAYED) === '1';
 export const markPlayed = () => write(PLAYED, '1');
+export const hasSeenNotice = () => read(NOTICE) === '1';
+export const markNoticeSeen = () => write(NOTICE, '1');

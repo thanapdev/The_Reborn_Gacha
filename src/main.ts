@@ -8,6 +8,7 @@ import { applyChoice, newState, pickDeath, pickRole } from './engine';
 import { renderCalculating } from './screens/calculating';
 import { renderCollection } from './screens/collection';
 import { renderLanding } from './screens/landing';
+import { showNotice } from './screens/notice';
 import { renderQuestion } from './screens/question';
 import { renderResult } from './screens/result';
 import { renderScript, type ScriptProps } from './screens/script';
@@ -79,3 +80,4 @@ async function run() {
 }
 
 landing();
+showNotice();

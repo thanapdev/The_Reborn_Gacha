@@ -21,16 +21,21 @@ test('phase result has no share button and does not render images', () => {
   expect(prepareCards).not.toHaveBeenCalled();
 });
 
-test('summary shows both cards and one share button that shares both', () => {
+test('summary: a share button under each card plus one that shares both', () => {
   const root = document.createElement('div');
   const cards = [card(), card()];
   renderResult(root, cards, ['death.png', 'destiny.png'], []);
   expect(root.querySelectorAll('.card-wrap article')).toHaveLength(2);
-  const shareButtons = [...root.querySelectorAll('.result button')].filter(b => b.textContent!.includes('แชร์'));
-  expect(shareButtons).toHaveLength(1);
+  const perCard = [...root.querySelectorAll<HTMLButtonElement>('.card-col button')];
+  expect(perCard).toHaveLength(2);
+  const all = [...root.querySelectorAll<HTMLButtonElement>('.actions button')].find(b => b.textContent!.includes('แชร์'))!;
+  expect(prepareCards).toHaveBeenCalledTimes(1);
   vi.advanceTimersByTime(GRACE_MS + 1);
-  (shareButtons[0] as HTMLButtonElement).click();
-  expect(shareCards).toHaveBeenCalledWith(cards, ['death.png', 'destiny.png'], expect.any(Promise));
+  perCard[1].click();
+  expect(shareCards).toHaveBeenLastCalledWith([cards[1]], ['destiny.png'], expect.any(Promise));
+  perCard[1].disabled = all.disabled = false; // first share never settles in this mock
+  all.click();
+  expect(shareCards).toHaveBeenLastCalledWith(cards, ['death.png', 'destiny.png'], expect.any(Promise));
 });
 
 test('other actions are disabled while the image is being shared', () => {

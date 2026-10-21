@@ -16,6 +16,7 @@ export function renderScript(root: HTMLElement, p: ScriptProps, onDone: () => vo
     <section class="screen script ${p.scene ?? ''}">
       <div class="lines" aria-live="polite"></div>
       <div class="finale" hidden></div>
+      <p class="tap-hint" aria-hidden="true">แตะเพื่อเร่ง</p>
       <div class="actions"></div>
     </section>`));
   const lines = screen.querySelector('.lines')!;
@@ -32,6 +33,7 @@ export function renderScript(root: HTMLElement, p: ScriptProps, onDone: () => vo
     while (shown < p.lines.length) reveal();
     if (p.finale) { finale.textContent = p.finale; finale.hidden = false; }
     skip?.remove();
+    screen.querySelector('.tap-hint')?.remove();
     const next = button(p.next ?? 'ไปต่อ →', 'btn primary');
     next.addEventListener('click', e => e.stopPropagation());
     onTap(next, onDone);
