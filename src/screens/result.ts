@@ -33,6 +33,7 @@ export function renderResult(root: HTMLElement, cards: HTMLElement[], filenames:
 
   // Cards stay 360×640 for a pixel-exact export; only their wrappers scale to fit narrow phones.
   const scale = String(Math.min(1, (Math.min(window.innerWidth, 480) - 32) / 360));
+  const wraps: HTMLElement[] = [];
   cards.forEach((card, i) => {
     const col = document.createElement('div');
     col.className = 'card-col';
@@ -43,6 +44,7 @@ export function renderResult(root: HTMLElement, cards: HTMLElement[], filenames:
     scaler.className = 'card-scale';
     scaler.append(card);
     wrap.append(scaler);
+    wraps.push(wrap);
     col.append(wrap);
     if (filenames && prepared) {
       const one = prepared.then(b => [b[i]]);
@@ -58,5 +60,15 @@ export function renderResult(root: HTMLElement, cards: HTMLElement[], filenames:
     const b = button(a.label, a.cls ?? 'btn');
     onTap(b, a.onClick);
     bar.append(b);
+  }
+  // Desktop: size the cards to fill the screen (bigger is easier to read) without scrolling. Phones scroll as usual.
+  if (window.innerWidth >= 800) {
+    // Heading and actions sit in a 280px side column (style.css), so only the share button shares the height.
+    const app = getComputedStyle(root);
+    const other = wraps[0].parentElement!.offsetHeight - wraps[0].offsetHeight + parseFloat(app.paddingTop) + parseFloat(app.paddingBottom);
+    const byHeight = (window.innerHeight - other) / 640;
+    const byWidth = (Math.min(window.innerWidth, 1200) - 32 - 312 - 32 * (cards.length - 1)) / (360 * cards.length);
+    const s = Math.max(0.6, Math.min(1.5, byHeight, byWidth));
+    wraps.forEach(w => w.style.setProperty('--s', String(s)));
   }
 }

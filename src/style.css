@@ -23,6 +23,8 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
+/* Desktop: no rubber-band bounce that reads as scrolling on pages that fit */
+@media (hover: hover) and (pointer: fine) { html, body { overscroll-behavior: none; } }
 ::selection { background: var(--lime); color: var(--ink); }
 body {
   font-family: var(--body);
@@ -110,8 +112,9 @@ h2 { margin: 0; font-size: 1.4rem; line-height: 1.4; }
 .logo-b { background: var(--lime); color: var(--ink); padding: 7px 12px; border-radius: 999px; border: 1.5px solid var(--paper); }
 .topbar .btn { min-height: 40px; padding: 6px 16px; font-size: 0.9rem; }
 
-.hero { position: relative; padding: 72px 0 96px; margin: auto 0; }
-.headline { display: flex; flex-direction: column; gap: 2px; }
+/* Breathing room shrinks on short screens so the landing fits without scrolling */
+.hero { position: relative; padding: clamp(24px, 7vh, 72px) 0 clamp(48px, 10vh, 96px); margin: auto 0; }
+.headline { margin: 0; display: flex; flex-direction: column; gap: 2px; }
 .headline .l {
   margin: 0; font-family: var(--head); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em;
   white-space: nowrap; color: var(--paper); text-shadow: var(--pop);
@@ -180,6 +183,32 @@ h2 { margin: 0; font-size: 1.4rem; line-height: 1.4; }
 .notice-box .muted { color: rgba(0, 0, 0, 0.6); font-size: 0.9rem; }
 .notice-box .btn { margin-top: 8px; }
 
+/* Landing on desktop: full-width hero, big type, cards spread out, tagline and button share a row.
+   1024px, not 800: narrower than that the spread-out cards collide with the headline. */
+@media (min-width: 1024px) {
+  #app:has(.landing) { max-width: 1200px; padding-left: 40px; padding-right: 40px; }
+  .landing { display: grid; grid-template-columns: 1fr 360px; grid-template-rows: auto 1fr auto auto; column-gap: 32px; align-items: center; }
+  .topbar, .hero, .credit { grid-column: 1 / -1; }
+  .hero { margin: 0; padding: clamp(16px, 4vh, 48px) 0 clamp(40px, 8vh, 80px); }
+  .headline { width: max-content; margin: 0 auto; }
+  .headline .l1 { font-size: min(8vw, 11vh); padding-left: 0; }
+  .headline .l2 { font-size: min(10vw, 14vh); padding-left: 0.5em; }
+  .headline .l3 { font-size: min(8vw, 11vh); padding-left: 1.6em; }
+  .float-a { left: 4%; bottom: 4%; }
+  .float-b { right: 4%; top: 6%; }
+  .glass { width: 180px; padding: 18px; border-radius: 32px; }
+  .avatar { width: 96px; height: 96px; margin-bottom: 12px; }
+  .glass b { font-size: 18px; }
+  .glass small { font-size: 12px; }
+  .squiggle { width: 96px; height: 96px; }
+  .squiggle-a { left: 24%; bottom: -4%; }
+  .squiggle-b { right: 24%; top: 0; }
+  .badge { width: 140px; height: 140px; right: 14%; bottom: -6%; }
+  .badge-core svg { width: 40px; height: 40px; }
+  .tagline { margin: 0; font-size: 1.5rem; }
+  .landing > .actions { margin: 0; padding: 0; }
+}
+
 /* Questions */
 .progress { display: flex; align-items: center; gap: 10px; font-family: var(--head); color: var(--muted); font-size: 0.9rem; }
 .progress-track { flex: 1; height: 10px; border-radius: 99px; background: rgba(255, 255, 255, 0.2); overflow: hidden; display: block; }
@@ -247,8 +276,15 @@ body[data-scene='heaven'] .script.reaction .line { color: var(--blue); text-shad
 .card-col { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 /* Desktop: summary cards side by side */
 @media (min-width: 800px) {
-  #app:has(.cards > .card-col + .card-col) { max-width: 800px; }
-  .cards { flex-direction: row; align-items: flex-start; gap: 32px; }
+  #app:has(.result) { max-width: 1200px; }
+  #app:has(.collection) { max-width: 800px; }
+  /* Cards take the full height; heading and buttons move to a side column */
+  .result { display: grid; grid-template-columns: auto 280px; grid-template-rows: 1fr auto 1fr; column-gap: 32px; row-gap: 16px; justify-content: center; align-items: center; }
+  .result .cards { grid-column: 1; grid-row: 1 / -1; flex-direction: row; align-items: flex-start; gap: 32px; }
+  .result .eyebrow { grid-column: 2; grid-row: 1; align-self: end; justify-self: start; text-align: left; border-radius: 14px; }
+  .result .actions { grid-column: 2; grid-row: 2; margin: 0; padding: 0; }
+  .collection .grid { grid-template-columns: repeat(5, 1fr); }
+  .collection .actions { align-self: center; width: 240px; }
 }
 
 /* Card (fixed 360×640; exported ×3 → 1080×1920) */
