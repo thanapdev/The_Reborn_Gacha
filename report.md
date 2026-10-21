@@ -63,8 +63,9 @@ src/
   data/deaths.ts      # 7 การตาย (profile, script, quip, cause, deathBonus)
   data/roles.ts       # 13 role (profile, tier, desc)
   data/goddess.ts     # บทเปิดของเทพธิดา
-  art/kit.ts          # palette + helper วาด SVG
-  art/roles.ts, art/deaths.ts   # SVG 20 ชิ้น (viewBox 200×200, ไม่มี id/gradient)
+  art/img.ts, art/roles.ts, art/deaths.ts   # map id → <img src="/art/<id>.webp">
+public/art/           # ภาพสติกเกอร์ 20 รูป 600×600 WebP พื้นใส (~28KB/รูป)
+pic/                  # ไฟล์ต้นฉบับจาก Gemini 1024px (ไม่อยู่ใน git — .gitignore)
   card.ts             # renderRoleCard, renderDeathCard (การ์ด 360×640 คงที่)
   share.ts            # prepareCards (render ล่วงหน้า 2 รอบ), shareCards (Web Share / download)
   storage.ts          # collection + played flag + notice flag, try/catch ทุกจุด
@@ -87,11 +88,13 @@ src/
 - **Desktop หน้าสรุป:** ขยาย `#app` เป็น 800px ด้วย `:has()` เฉพาะตอนมีการ์ด 2 ใบ หน้าอื่นยังกว้าง 480px
 - **กัน double-tap:** ทุกหน้าจอไม่รับการแตะ 350ms แรกหลัง mount (`onTap` ใน `dom.ts`) — ปุ่มใหม่ต้องใช้ `onTap` ไม่ใช่ `addEventListener('click')`
 - **ธีม Bold Blue (2026-10-21):** ดัดแปลงจากคอมโพเนนต์ React+Tailwind ที่ผู้ใช้ส่งมา แต่เขียนเป็น CSS ล้วน ไม่ได้ลง React/Tailwind/shadcn/motion — อย่าเพิ่ม stack พวกนี้เพื่อ "ทำให้ตรงต้นฉบับ" ฉาก: night = น้ำเงิน+กริด, death = กรมท่าเข้ม #070b24 + แสงแดงกลางจอ (เดิมเป็นดำล้วน ผู้ใช้บอกไม่สวย), heaven = ฟ้าอ่อน #e9eeff + กริดน้ำเงิน ตัวหนังสือน้ำเงินเข้ม (เดิมขาวล้วน) (`--bg` เปลี่ยนตาม `data-scene`); การ์ดแชร์ก็ใช้ธีมนี้ (พื้นน้ำเงินมีกริด, การ์ดตายพื้นกรมท่า+แสงแดง, สีกรอบรูปตาม tier)
+- **ภาพตัวละคร:** เจนด้วย Gemini ตาม `docs/art-prompts.md` แปลงโดย crop กลาง 880/1024px (ตัด watermark ✦ มุมขวาล่างออก + ให้ตัวละครเต็มวงกลม) → ลบพื้นเทา (~221) ด้วย flood fill จากขอบ (เส้นขอบขาวของสติกเกอร์กันไม่ให้ลามเข้าตัว) → 600×600 WebP; ทำด้วย sharp ใน scratchpad ไม่ได้ติดตั้งในโปรเจกต์ ถ้าจะเพิ่มรูปใหม่ให้ทำแบบเดียวกัน; `prepareCards` รอ `img.decode()` ก่อน export ไม่งั้นรูปหายจาก PNG
 - Google Fonts `<link>` ต้องมี `crossorigin="anonymous"` ไม่งั้น html-to-image ฝังฟอนต์ไม่ได้
 
 ## 6. สถานะปัจจุบัน
 
-- ✅ test 61/61 ผ่าน, build ผ่าน
+- ✅ test 61/61 ผ่าน, build ผ่าน (art test เช็กว่ามีไฟล์ webp ครบทุก id)
+- ✅ export PNG การ์ดจริงหลังเปลี่ยนเป็นภาพ WebP: 1080×1920 มีรูปตัวละครครบ (headless Chrome)
 - ✅ ธีม Bold Blue: เล่นจบทั้งเกมใน headless Chrome ที่ 390px ดูทุกหน้าแล้ว — ⚠️ ยังไม่ได้ลองสร้าง PNG จริงหลังเปลี่ยนธีม
 - ✅ ทดสอบใน headless Chrome: เล่นจบทั้งเส้นทางปกติและเส้นทางไก่ ไม่มี console error, PNG 1080×1920, ฟอนต์ไทยถูก
 - ✅ deploy บน Vercel แล้ว (push ธีม Bold Blue 2026-10-21)
@@ -129,3 +132,5 @@ src/
 | 2026-10-21 | (commit นี้) | ปรับสีฉากตาย→เทพธิดาให้เข้าธีม (กรมท่า+แดง / ฟ้าอ่อน+น้ำเงิน); UX: ตัวเลือกคำถามย้ายลงล่างจอ (นิ้วโป้งถึง), บทพูดจัดกลางจอ, ฉากเทพธิดาบทพูดอยู่ในกล่อง, เพิ่มคำใบ้ "แตะเพื่อเร่ง" ระหว่างเล่นบท |
 | 2026-10-21 | (commit นี้) | Popup แจ้งเตือนครั้งแรก; Landing ตัดกล่อง 3 ขั้นออก ใส่ credit GitHub @thanapdev, จัด hero กลางจอ ปุ่มเริ่มอยู่ล่าง; หน้าสรุป: desktop วางการ์ดข้างกัน, ปุ่มแชร์ใต้การ์ดแต่ละใบ + ปุ่มแชร์ทั้ง 2 ใบ |
 | 2026-10-21 | (commit นี้) | แก้ตัวหนังสือ "แน่ใจนะ?" ในฉากเทพธิดาที่อ่านไม่ออก (ตัวกรมท่าบนเงากรมท่า) → ตัวน้ำเงินเงาขาวบาง |
+| 2026-10-21 | (commit นี้) | เพิ่ม `docs/art-prompts.md` (รายการรูป 20 รูป + requirement + prompt) |
+| 2026-10-21 | (commit นี้) | เปลี่ยนภาพ SVG ทั้ง 20 เป็นภาพสติกเกอร์จาก Gemini (`public/art/*.webp`) ลบ `art/kit.ts`; share รอรูปโหลดก่อน export |

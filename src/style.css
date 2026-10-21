@@ -134,7 +134,7 @@ h2 { margin: 0; font-size: 1.4rem; line-height: 1.4; }
 .float-a .glass { transform: rotate(-12deg); }
 .float-b .glass { transform: rotate(12deg); }
 .avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; margin-bottom: 8px; background: var(--blue-deep); border: 3px solid rgba(255, 255, 255, 0.5); }
-.avatar svg { width: 100%; height: 100%; display: block; }
+.avatar img { width: 100%; height: 100%; display: block; }
 .glass b { font: 700 14px/1.2 var(--head); }
 .glass small { font-size: 11px; color: var(--muted); }
 
@@ -296,7 +296,7 @@ body[data-scene='heaven'] .script.reaction .line { color: var(--blue); text-shad
 .card-kicker.died { background: none; color: var(--red); font-size: 1.4rem; font-weight: 700; letter-spacing: 0.16em; text-shadow: 3px 3px 0 #4a0000; }
 .card-art { width: 176px; height: 176px; flex: none; border-radius: 50%; overflow: hidden; background: var(--blue-deep); border: 4px solid var(--frame); }
 .death .card-art { background: #1a1030; }
-.card-art svg { width: 100%; height: 100%; display: block; }
+.card-art img { width: 100%; height: 100%; display: block; }
 .card-title { margin: 0; font-size: 2rem; line-height: 1.15; color: var(--paper); text-shadow: 4px 4px 0 var(--blue-deep); }
 .death .card-title { text-shadow: 4px 4px 0 #3a0000; }
 .card-sub { font-size: 0.95rem; color: var(--frame); letter-spacing: 0.06em; line-height: 1.3; }
@@ -325,7 +325,7 @@ body[data-scene='heaven'] .script.reaction .line { color: var(--blue); text-shad
 .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .slot { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 20px; background: var(--paper); color: var(--ink); text-align: center; font-size: 0.85rem; box-shadow: 4px 4px 0 var(--blue-deep); }
 .slot-art { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; overflow: hidden; background: var(--blue-deep); font-family: var(--head); font-size: 2rem; color: var(--paper); }
-.slot-art svg { width: 100%; height: 100%; }
+.slot-art img { width: 100%; height: 100%; }
 .slot small { padding: 0 8px; border-radius: 999px; background: var(--lime); font-family: var(--head); }
 .slot.locked { background: var(--glass); color: var(--muted); box-shadow: none; border: 1px dashed var(--glass-line); }
 .slot.locked .slot-art { background: rgba(0, 0, 0, 0.2); }

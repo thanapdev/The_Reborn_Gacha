@@ -27,6 +27,8 @@ function download(blob: Blob, filename: string): void {
  */
 export async function prepareCards(els: HTMLElement[]): Promise<Blob[]> {
   await document.fonts.ready;
+  // A card image that hasn't loaded yet would be missing from the export.
+  await Promise.all(els.flatMap(el => [...el.querySelectorAll('img')].map(i => i.decode().catch(() => {}))));
   const blobs: Blob[] = [];
   for (const el of els) {
     await toBlob(el, { pixelRatio: PIXEL_RATIO });

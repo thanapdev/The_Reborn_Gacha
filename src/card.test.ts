@@ -17,7 +17,7 @@ test('role card shows identity, tier frame, 5 stat bars, jokes and cause of deat
   expect(el.textContent).toContain('จอมเวท');
   expect(el.textContent).toContain('THE GREAT MAGE');
   expect(el.querySelectorAll('.bar')).toHaveLength(5);
-  expect(el.querySelector('svg')).not.toBeNull();
+  expect(el.querySelector('img')).not.toBeNull();
   mage.desc.forEach(line => expect(el.textContent).toContain(line));
   expect(el.textContent).toContain(wet.cause);
 });
@@ -34,5 +34,5 @@ test('death card shows YOU DIED, title, rank and quip', () => {
   expect(el.textContent).toContain('YOU DIED');
   expect(el.textContent).toContain(wet.title);
   expect(el.textContent).toContain(wet.quip);
-  expect(el.querySelector('svg')).not.toBeNull();
+  expect(el.querySelector('img')).not.toBeNull();
 });
